@@ -60,6 +60,10 @@
    D-> (repeat 7 second-part)
    (pdf txt fuel radios))
 
+#;(define-text-report
+    [vor frequency]
+    [airport approach])
+
 #;(define Generator (-> file (-> Route Any)))
 #;(define-generator (λ (route) (txt route)))
 
@@ -71,6 +75,9 @@
 #;(plan-route
    boston-north-to-maine-part1
    D-> boston-north-to-maine-part2)
+
+#;(symbol-lookup 'BOS)
+;; TODO: possibly use this to import from data source
 
 ;; Semantics
 ;; final route plan must start and end at an airport
