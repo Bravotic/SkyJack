@@ -1,0 +1,84 @@
+                                    Skyjack
+                    A Flight Navigation Programming Language
+
+                  Alexander Chang-Davidson and Collin McKinley
+
+--------------------------------------------------------------------------------
+                                    Purpose
+
+Flight navigation is a complicated task made worse by a lack of good software.
+Skyjack is an alternative to using traditional software to plan flights. Skyjack
+uses the power of the Racket programming language to create an easy to use and
+familiar macro system for describing a flight plan. It then takes this
+description and turns it into data structures which can be used by arbitrary
+Racket programs to do operations on these flight plans. Alongside this, Skyjack
+will also do rudimentary error checking on flight plans even before they are
+generated, allowing for mistakes to be caught early.
+
+--------------------------------------------------------------------------------
+                                    Concepts
+
+Skyjack incorporates many concepts from aviation directly into its core design
+to make it more familiar to pilots. Some of these concepts can be found below.
+
+Flight Plan:
+  A flight plan is a series of positions which comprise a route from one airport
+  to another. These positions in the middle may be either other airports or VOR
+  navigation aids.
+
+Radio Frequency:
+  A radio frequency represents a radio channel which a pilot can tune their
+  aircraft radio to in order to either communicate with an air traffic
+  controller or to navigate off of. All aircraft radio frequencies are in the
+  VHF range between 118.0 MHz and 137.0 MHz. The lowest 10 MHz, 108.0 to 118.0
+  are reserved for navigation aids, whereas the rest are used for voice
+  communication.
+
+Airports:
+  Airports refer to any place where a plane can take off or land. They serve as
+  terminals to the flight plan, and are required for a plan to be valid. They
+  may also serve as midpoints along a flight. Each airport has a number of radio
+  channels which are used to coordinate takeoff, landing, and other functions.
+  Airports can also vary in size, which limits what planes can takeoff and land
+  there. Airports also have a set GPS location and elevation. This information
+  is exposed to Skyjack through the Airport data structure.
+
+VORs:
+  VORs are radio way points which comprise the middle parts of a flight plan.
+  They are small radio transmitters which send out a signal which is received by
+  the aircraft in order to determine direction. VORs have a set radio frequency
+  within the VHF aviation radio band. To identify whether or not a pilot has
+  tuned to the correct VOR, the VOR transmits a short string of Morse code with
+  its identifier. A VOR also has a set of coordinates to where the transmitter
+  is housed. This information is exposed to Skyjack through the VOR data
+  structure.
+
+--------------------------------------------------------------------------------
+                                   Milestones
+
+Milestone 1:
+  For our first milestone, we want to get our core data structures for Airports,
+  VORs, and flight plans implemented and tested. We would also like to start
+  creating functions which can be used to check the feasibility of flight plans
+  for future error checking.
+
+Milestone 2:
+  For milestone 2, we want to get into more of the language part of the
+  programming language. First and foremost we want to get our macros for
+  defining a flight plan (define-plan), defining an airport (define-airport),
+  and defining a VOR (define-vor) implemented and make sure they are able to
+  generate their corresponding data structure. We also want to start working on
+  route composition functions and basic output report generation.
+
+Milestone 3:
+  For milestone 3, we want to focus on expanding the capabilities of the
+  language by allowing for pre-made airport definitions to be loaded in from
+  external sources. We also want to implement a beginner friendly syntax for
+  easier customization of output reports. We also want to focus on adding new
+  arbitrary formats for reports such as PDF or Google Maps. Finally, we want to
+  add a new data structure for airplanes, and the corresponding macro
+  (define-airplane) in order to perform more error checking and feasibility
+  checking.
+  
+--------------------------------------------------------------------------------
+                                    Grammar
