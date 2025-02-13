@@ -82,3 +82,50 @@ Milestone 3:
   
 --------------------------------------------------------------------------------
                                     Grammar
+
+Navigation Point Declarations
+  These generally follow the following syntax with each concept having more
+  specific key value pair specifications. A nav-id is a unique identifier in 
+  the form of [A-Z]+ This syntax defines the nav-id as a racket variable and 
+  adds it to a language global lookup table. Every nav-id defined can only be 
+  defined once.
+                (define-<concept> <nav-id> [<key> <values>] ...)
+
+Airport Declarations
+  Airport nav-ids are 4 characters. The size indicates the type of aircraft it
+  can support, the radio specifies a map of names to frequencies relevant when
+  interacting with it. Coordinates defines the gps latitude and longitude of
+  the airport. The elevation of the airport is specified in feet.
+                (define-airport <nav-id> 
+                                [size <small | medium | large>]
+                                [radio (<name> <frequency>) ...]
+                                [coordinates <latitude> <longitude>]
+                                [elevation <feet>])
+
+VOR Declarations
+  VOR nav-ids are 3 characters. The power indicates the approximate radius of
+  coverage. The coordinates show where the origin of the signal.
+                (define-vor <nav-id>
+                            [frequency <frequency>]
+                            [power <low | medium | high>]
+                            [coordinates <latitude> <longitude>])
+  
+Flight Plans
+  Creates a statically determined flight plan
+                (define-plan <plan-name> <plan>)
+                plan := <nav-id or plan-name>
+                        | <nav-id or plan-name> D-> <plan>
+
+  Create a runtime checked flight plan. This allows for fully dynamic symbol
+  lookup or computed plans. plan-exprs must at runtime resolve to one of
+  a NavAid, a previously defined static plan, or a runtime plan structure.
+    (create-plan <runtime-plan>)
+    runtime-plan := <nav-id or plan-name or plan-expr>
+                    | <nav-id or plan-name or plan-expr> D-> <runtime-plan>
+
+Runtime functions
+  nav-lookup : NavId -> [Union NavAid #f]
+  get-all-aiports : -> [Hash Symbol NavAid]
+  get-all-vors : -> [Hash Symbol NavAid]
+  get-navaids-near : Coordinate Distance -> [Hash Symbol NavAid]
+  generate-report : Plan -> File
