@@ -79,49 +79,66 @@ Milestone 3:
   add a new data structure for airplanes, and the corresponding macro
   (define-airplane) in order to perform more error checking and feasibility
   checking.
-  
+
 --------------------------------------------------------------------------------
                                     Grammar
 
 Navigation Point Declarations
   These generally follow the following syntax with each concept having more
-  specific key value pair specifications. A nav-id is a unique identifier in 
-  the form of [A-Z]+ This syntax defines the nav-id as a racket variable and 
-  adds it to a language global lookup table. Every nav-id defined can only be 
+  specific key value pair specifications. A nav-id is a unique identifier in
+  the form of [A-Z]+ This syntax defines the nav-id as a racket variable and
+  adds it to a language global lookup table. Every nav-id defined can only be
   defined once.
-                (define-<concept> <nav-id> [<key> <values>] ...)
+
+    +----------------------------------------------------------------------+
+    | (define-<concept> <nav-id> [<key> <values>] ...)                     |
+    +----------------------------------------------------------------------+
 
 Airport Declarations
   Airport nav-ids are 4 characters. The size indicates the type of aircraft it
   can support, the radio specifies a map of names to frequencies relevant when
   interacting with it. Coordinates defines the gps latitude and longitude of
   the airport. The elevation of the airport is specified in feet.
-                (define-airport <nav-id> 
-                                [size <small | medium | large>]
-                                [radio (<name> <frequency>) ...]
-                                [coordinates <latitude> <longitude>]
-                                [elevation <feet>])
+
+    +----------------------------------------------------------------------+
+    | (define-airport <nav-id>                                             |
+    |                 [size <small | medium | large>]                      |
+    |                 [radio (<name> <frequency>) ...]                     |
+    |                 [coordinates <latitude> <longitude>]                 |
+    |                 [elevation <feet>])                                  |
+    +----------------------------------------------------------------------+
 
 VOR Declarations
   VOR nav-ids are 3 characters. The power indicates the approximate radius of
   coverage. The coordinates show where the origin of the signal.
-                (define-vor <nav-id>
-                            [frequency <frequency>]
-                            [power <low | medium | high>]
-                            [coordinates <latitude> <longitude>])
-  
+
+    +----------------------------------------------------------------------+
+    | (define-vor <nav-id>                                                 |
+    |             [frequency <frequency>]                                  |
+    |             [power <low | medium | high>]                            |
+    |             [coordinates <latitude> <longitude>])                    |
+    +----------------------------------------------------------------------+
+
 Flight Plans
   Creates a statically determined flight plan
-                (define-plan <plan-name> <plan>)
-                plan := <nav-id or plan-name>
-                        | <nav-id or plan-name> D-> <plan>
+
+    +----------------------------------------------------------------------+
+    | (define-plan <plan-name> <plan>)                                     |
+    |                                                                      |
+    | plan := <nav-id or plan-name>                                        |
+    |       | <nav-id or plan-name> D-> <plan>                             |
+    +----------------------------------------------------------------------+
 
   Create a runtime checked flight plan. This allows for fully dynamic symbol
   lookup or computed plans. plan-exprs must at runtime resolve to one of
   a NavAid, a previously defined static plan, or a runtime plan structure.
-    (create-plan <runtime-plan>)
-    runtime-plan := <nav-id or plan-name or plan-expr>
-                    | <nav-id or plan-name or plan-expr> D-> <runtime-plan>
+
+    +----------------------------------------------------------------------+
+    | (create-plan <runtime-plan>)                                         |
+    |                                                                      |
+    | runtime-plan := <nav-id or plan-name or plan-expr>                   |
+    |               | <nav-id or plan-name or plan-expr> D-> <runtime-plan>|
+    +----------------------------------------------------------------------+
 
 Runtime functions
   nav-lookup : NavId -> [Union NavAid #f]
@@ -134,131 +151,131 @@ Runtime functions
                                     Examples
 
 Simple valid program
-```
-(define-airport KBOS
-	[size large]
-	[radio
-    	  ("D-ATIS" 135.0)
-    	  ("Tower East" 132.225)
-    	  ("Tower West" 128.8)
-    	  ("Ground" 121.75)
-    	  ("Clearance" 121.65)
-    	  ("Ramp" 134.05)]
-	[coordinates 42.36197 -71.0079]
-	[elevation 20])
-(define-airport KJFK
-	[size large]
-	[radio
-    	  ("D-ATIS" 135.0)
-    	  ("Tower East" 132.225)
-    	  ("Tower West" 128.8)
-    	  ("Ground" 121.75)
-    	  ("Clearance" 121.65)
-    	  ("Ramp" 134.05)]
-	[coordinates 42.36197 -71.0079]
-	[elevation 20])
-
-(define-vor PVD
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor ORW
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor CCC
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-
-(define-plan boston-to-new-york-city
-    	KBOS
-	D-> PVD
-	D-> ORW
-	D-> CCC
-	D-> KJFK)
-
-(generate-report boston-to-new-york-city)
-```
+    +----------------------------------------------------------------------+
+    | (define-airport KBOS                                                 |
+    |   [size large]                                                       |
+    |   [radio                                                             |
+    |         ("D-ATIS" 135.0)                                             |
+    |         ("Tower East" 132.225)                                       |
+    |         ("Tower West" 128.8)                                         |
+    |         ("Ground" 121.75)                                            |
+    |         ("Clearance" 121.65)                                         |
+    |         ("Ramp" 134.05)]                                             |
+    |   [coordinates 42.36197 -71.0079]                                    |
+    |   [elevation 20])                                                    |
+    | (define-airport KJFK                                                 |
+    |   [size large]                                                       |
+    |   [radio                                                             |
+    |         ("D-ATIS" 135.0)                                             |
+    |         ("Tower East" 132.225)                                       |
+    |         ("Tower West" 128.8)                                         |
+    |         ("Ground" 121.75)                                            |
+    |         ("Clearance" 121.65)                                         |
+    |         ("Ramp" 134.05)]                                             |
+    |   [coordinates 42.36197 -71.0079]                                    |
+    |   [elevation 20])                                                    |
+    |                                                                      |
+    | (define-vor PVD                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor ORW                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor CCC                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |                                                                      |
+    | (define-plan boston-to-new-york-city                                 |
+    |       KBOS                                                           |
+    |   D-> PVD                                                            |
+    |   D-> ORW                                                            |
+    |   D-> CCC                                                            |
+    |   D-> KJFK)                                                          |
+    |                                                                      |
+    | (generate-report boston-to-new-york-city)                            |
+    +----------------------------------------------------------------------+
 
 Program with compile time errors, but syntactically valid
-```
-(define-airport KBOS
-	[size large]
-	[radio
-    	  ("D-ATIS" 135.0)
-    	  ("Tower East" 132.225)
-    	  ("Tower West" 128.8)
-    	  ("Ground" 121.75)
-    	  ("Clearance" 121.65)
-    	  ("Ramp" 134.05)]
-	[coordinates 42.36197 -71.0079]
-	[elevation 20])
-(define-airport KBGR
-	[size large]
-	[radio
-    	  ("D-ATIS" 135.0)
-    	  ("Tower East" 132.225)
-    	  ("Tower West" 128.8)
-    	  ("Ground" 121.75)
-    	  ("Clearance" 121.65)
-    	  ("Ramp" 134.05)]
-	[coordinates 42.36197 -71.0079]
-	[elevation 20])
-(define-airport KCON
-	[size large]
-	[radio
-    	  ("D-ATIS" 135.0)
-    	  ("Tower East" 132.225)
-    	  ("Tower West" 128.8)
-    	  ("Ground" 121.75)
-    	  ("Clearance" 121.65)
-    	  ("Ramp" 134.05)]
-	[coordinates 42.36197 -71.0079]
-	[elevation 20])
-
-(define-vor PSM
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor ENE
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor AUG
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor BGR
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor SFO
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-(define-vor CON
-	[frequency 115.6]
-	[power high]
-	[coordinates 41.724300384521484 -71.42960357666016])
-
-(define-plan boston-north-departure
-    	KBOS
-	D-> PSM)
-
-(define-plan boston-to-bangor
-    	boston-north-departure
-	D-> ENE
-	D-> AUG
-	D-> BGR
-	D-> SFO
-	D-> KBGR)
-
-(define-plan boston-to-concord
-    	boston-north-departure
-	D-> CON
-	D-> KCON)
-
-(generate-report boston-to-bangor)
-(generate-report boston-to-concord)
-```
+    +----------------------------------------------------------------------+
+    | (define-airport KBOS                                                 |
+    |   [size large]                                                       |
+    |   [radio                                                             |
+    |         ("D-ATIS" 135.0)                                             |
+    |         ("Tower East" 132.225)                                       |
+    |         ("Tower West" 128.8)                                         |
+    |         ("Ground" 121.75)                                            |
+    |         ("Clearance" 121.65)                                         |
+    |         ("Ramp" 134.05)]                                             |
+    |   [coordinates 42.36197 -71.0079]                                    |
+    |   [elevation 20])                                                    |
+    | (define-airport KBGR                                                 |
+    |   [size large]                                                       |
+    |   [radio                                                             |
+    |         ("D-ATIS" 135.0)                                             |
+    |         ("Tower East" 132.225)                                       |
+    |         ("Tower West" 128.8)                                         |
+    |         ("Ground" 121.75)                                            |
+    |         ("Clearance" 121.65)                                         |
+    |         ("Ramp" 134.05)]                                             |
+    |   [coordinates 42.36197 -71.0079]                                    |
+    |   [elevation 20])                                                    |
+    | (define-airport KCON                                                 |
+    |   [size large]                                                       |
+    |   [radio                                                             |
+    |         ("D-ATIS" 135.0)                                             |
+    |         ("Tower East" 132.225)                                       |
+    |         ("Tower West" 128.8)                                         |
+    |         ("Ground" 121.75)                                            |
+    |         ("Clearance" 121.65)                                         |
+    |         ("Ramp" 134.05)]                                             |
+    |   [coordinates 42.36197 -71.0079]                                    |
+    |   [elevation 20])                                                    |
+    |                                                                      |
+    | (define-vor PSM                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor ENE                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor AUG                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor BGR                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor SFO                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    | (define-vor CON                                                      |
+    |   [frequency 115.6]                                                  |
+    |   [power high]                                                       |
+    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |                                                                      |
+    | (define-plan boston-north-departure                                  |
+    |       KBOS                                                           |
+    |   D-> PSM)                                                           |
+    |                                                                      |
+    | (define-plan boston-to-bangor                                        |
+    |       boston-north-departure                                         |
+    |   D-> ENE                                                            |
+    |   D-> AUG                                                            |
+    |   D-> BGR                                                            |
+    |   D-> SFO                                                            |
+    |   D-> KBGR)                                                          |
+    |                                                                      |
+    | (define-plan boston-to-concord                                       |
+    |       boston-north-departure                                         |
+    |   D-> CON                                                            |
+    |   D-> KCON)                                                          |
+    |                                                                      |
+    | (generate-report boston-to-bangor)                                   |
+    | (generate-report boston-to-concord)                                  |
+    +----------------------------------------------------------------------+
