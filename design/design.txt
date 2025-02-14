@@ -129,3 +129,136 @@ Runtime functions
   get-all-vors : -> [Hash Symbol NavAid]
   get-navaids-near : Coordinate Distance -> [Hash Symbol NavAid]
   generate-report : Plan -> File
+
+--------------------------------------------------------------------------------
+                                    Examples
+
+Simple valid program
+```
+(define-airport KBOS
+	[size large]
+	[radio
+    	  ("D-ATIS" 135.0)
+    	  ("Tower East" 132.225)
+    	  ("Tower West" 128.8)
+    	  ("Ground" 121.75)
+    	  ("Clearance" 121.65)
+    	  ("Ramp" 134.05)]
+	[coordinates 42.36197 -71.0079]
+	[elevation 20])
+(define-airport KJFK
+	[size large]
+	[radio
+    	  ("D-ATIS" 135.0)
+    	  ("Tower East" 132.225)
+    	  ("Tower West" 128.8)
+    	  ("Ground" 121.75)
+    	  ("Clearance" 121.65)
+    	  ("Ramp" 134.05)]
+	[coordinates 42.36197 -71.0079]
+	[elevation 20])
+
+(define-vor PVD
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor ORW
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor CCC
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+
+(define-plan boston-to-new-york-city
+    	KBOS
+	D-> PVD
+	D-> ORW
+	D-> CCC
+	D-> KJFK)
+
+(generate-report boston-to-new-york-city)
+```
+
+Program with compile time errors, but syntactically valid
+```
+(define-airport KBOS
+	[size large]
+	[radio
+    	  ("D-ATIS" 135.0)
+    	  ("Tower East" 132.225)
+    	  ("Tower West" 128.8)
+    	  ("Ground" 121.75)
+    	  ("Clearance" 121.65)
+    	  ("Ramp" 134.05)]
+	[coordinates 42.36197 -71.0079]
+	[elevation 20])
+(define-airport KBGR
+	[size large]
+	[radio
+    	  ("D-ATIS" 135.0)
+    	  ("Tower East" 132.225)
+    	  ("Tower West" 128.8)
+    	  ("Ground" 121.75)
+    	  ("Clearance" 121.65)
+    	  ("Ramp" 134.05)]
+	[coordinates 42.36197 -71.0079]
+	[elevation 20])
+(define-airport KCON
+	[size large]
+	[radio
+    	  ("D-ATIS" 135.0)
+    	  ("Tower East" 132.225)
+    	  ("Tower West" 128.8)
+    	  ("Ground" 121.75)
+    	  ("Clearance" 121.65)
+    	  ("Ramp" 134.05)]
+	[coordinates 42.36197 -71.0079]
+	[elevation 20])
+
+(define-vor PSM
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor ENE
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor AUG
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor BGR
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor SFO
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+(define-vor CON
+	[frequency 115.6]
+	[power high]
+	[coordinates 41.724300384521484 -71.42960357666016])
+
+(define-plan boston-north-departure
+    	KBOS
+	D-> PSM)
+
+(define-plan boston-to-bangor
+    	boston-north-departure
+	D-> ENE
+	D-> AUG
+	D-> BGR
+	D-> SFO
+	D-> KBGR)
+
+(define-plan boston-to-concord
+    	boston-north-departure
+	D-> CON
+	D-> KCON)
+
+(generate-report boston-to-bangor)
+(generate-report boston-to-concord)
+```
