@@ -116,6 +116,7 @@ VOR Declarations
     | (define-vor <nav-id>                                                 |
     |             [frequency <frequency>]                                  |
     |             [power <low | medium | high>]                            |
+    |             [elevation <feet>]                                       |
     |             [coordinates <latitude> <longitude>])                    |
     +----------------------------------------------------------------------+
 
@@ -166,27 +167,29 @@ Simple valid program
     | (define-airport KJFK                                                 |
     |   [size large]                                                       |
     |   [radio                                                             |
-    |         ("D-ATIS" 135.0)                                             |
-    |         ("Tower East" 132.225)                                       |
-    |         ("Tower West" 128.8)                                         |
-    |         ("Ground" 121.75)                                            |
-    |         ("Clearance" 121.65)                                         |
-    |         ("Ramp" 134.05)]                                             |
-    |   [coordinates 42.36197 -71.0079]                                    |
-    |   [elevation 20])                                                    |
+    |         ("D-ATIS" 115.1)                                             |
+    |         ("Tower" 119.1)                                              |
+    |         ("Tower Alt" 123.9)                                          |
+    |         ("Ground" 121.9)                                             |
+    |         ("Clearance" 135.05)]                                        |
+    |   [coordinates 40.639447 -73.779317]                                 |
+    |   [elevation 13])                                                    |
     |                                                                      |
     | (define-vor PVD                                                      |
     |   [frequency 115.6]                                                  |
     |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [elevation 49]                                                     |
+    |   [coordinates 41.7243003845215 -71.4296035766602])                  |
     | (define-vor ORW                                                      |
-    |   [frequency 115.6]                                                  |
+    |   [frequency 110.0]                                                  |
     |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [elevation 310]                                                    |
+    |   [coordinates 41.5564002990723 -71.999397277832])                   |
     | (define-vor CCC                                                      |
-    |   [frequency 115.6]                                                  |
-    |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [frequency 117.2]                                                  |
+    |   [power medium]                                                     |
+    |   [elevation 86]                                                     |
+    |   [coordinates 40.9295997619629 -72.7988967895508])                  |
     |                                                                      |
     | (define-plan boston-to-new-york-city                                 |
     |       KBOS                                                           |
@@ -212,52 +215,53 @@ Program with compile time errors, but syntactically valid
     |   [coordinates 42.36197 -71.0079]                                    |
     |   [elevation 20])                                                    |
     | (define-airport KBGR                                                 |
-    |   [size large]                                                       |
+    |   [size medium]                                                      |
     |   [radio                                                             |
-    |         ("D-ATIS" 135.0)                                             |
-    |         ("Tower East" 132.225)                                       |
-    |         ("Tower West" 128.8)                                         |
-    |         ("Ground" 121.75)                                            |
-    |         ("Clearance" 121.65)                                         |
-    |         ("Ramp" 134.05)]                                             |
-    |   [coordinates 42.36197 -71.0079]                                    |
-    |   [elevation 20])                                                    |
+    |         ("D-ATIS" 127.75)                                            |
+    |         ("Tower" 120.7)                                              |
+    |         ("Ground" 121.9)                                             |
+    |         ("Clearance" 135.9)]                                         |
+    |   [coordinates 44.8074 -68.828102]                                   |
+    |   [elevation 192])                                                   |
     | (define-airport KCON                                                 |
-    |   [size large]                                                       |
+    |   [size medium]                                                      |
     |   [radio                                                             |
-    |         ("D-ATIS" 135.0)                                             |
-    |         ("Tower East" 132.225)                                       |
-    |         ("Tower West" 128.8)                                         |
-    |         ("Ground" 121.75)                                            |
-    |         ("Clearance" 121.65)                                         |
-    |         ("Ramp" 134.05)]                                             |
-    |   [coordinates 42.36197 -71.0079]                                    |
-    |   [elevation 20])                                                    |
+    |         ("Approach/Departure" 127.35)                                |
+    |         ("Clearance" 133.65)                                         |
+    |         ("Bangor RDO" 122.3)]                                        |
+    |   [coordinates 43.20270157 -71.50229645]                             |
+    |   [elevation 342])                                                   |
     |                                                                      |
     | (define-vor PSM                                                      |
-    |   [frequency 115.6]                                                  |
-    |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [frequency 116.5]                                                  |
+    |   [power medium]                                                     |
+    |   [elevation 99]                                                     |
+    |   [coordinates 43.0844993591309 -70.8320007324219])                  |
     | (define-vor ENE                                                      |
-    |   [frequency 115.6]                                                  |
+    |   [frequency 117.1]                                                  |
     |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [elevation 190]                                                    |
+    |   [coordinates 43.4257011413574 -70.6135025024414])                  |
     | (define-vor AUG                                                      |
-    |   [frequency 115.6]                                                  |
-    |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [frequency 111.4]                                                  |
+    |   [power medium]                                                     |
+    |   [elevation 349]                                                    |
+    |   [coordinates 44.3199996948242 -69.7966003417969])                  |
     | (define-vor BGR                                                      |
-    |   [frequency 115.6]                                                  |
+    |   [frequency 114.8]                                                  |
     |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [elevation 359]                                                    |
+    |   [coordinates 44.8418006896973 -68.8740005493164])                  |
     | (define-vor SFO                                                      |
-    |   [frequency 115.6]                                                  |
-    |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [frequency 115.8]                                                  |
+    |   [power medium]                                                     |
+    |   [elevation 13]                                                     |
+    |   [coordinates 37.619499206543 -122.374000549316])                   |
     | (define-vor CON                                                      |
-    |   [frequency 115.6]                                                  |
-    |   [power high]                                                       |
-    |   [coordinates 41.724300384521484 -71.42960357666016])               |
+    |   [frequency 112.9]                                                  |
+    |   [power medium]                                                     |
+    |   [elevation 710]                                                    |
+    |   [coordinates 43.2197990417481 -71.5755004882813])                  |
     |                                                                      |
     | (define-plan boston-north-departure                                  |
     |       KBOS                                                           |
