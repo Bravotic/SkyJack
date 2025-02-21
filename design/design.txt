@@ -30,7 +30,7 @@ Radio Frequency:
   A radio frequency represents a radio channel which a pilot can tune their
   aircraft radio to in order to either communicate with an air traffic
   controller or to navigate off of. All aircraft radio frequencies are in the
-  VHF range between 118.0 MHz and 137.0 MHz. The lowest 10 MHz, 108.0 to 118.0
+  VHF range between 108.0 MHz and 137.0 MHz. The lowest 10 MHz, 108.0 to 118.0
   are reserved for navigation aids, whereas the rest are used for voice
   communication.
 
