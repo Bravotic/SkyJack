@@ -5,18 +5,23 @@
 
 (define (nav-id/c x)
   (and (symbol? x)
-       (regexp-match? #rx"^[A-Z0-9-]+$" (symbol->string x))))
+       (regexp-match? #rx"^[A-Z0-9:-]+$" (symbol->string x))))
 
 (define latitude/c (between/c -90 90))
 (define longitude/c (between/c -180 180))
 
 (define size/c (one-of/c 'small 'medium 'large))
+
+(define (mghz->hertz x) (* x 1000))
+
 (define (vor-freq/c x)
   (and (integer? x)
        (>= x 108000)
        (<= x 118000)
        (integer? (/ x 50))))
-(define airport-freq/c (>=/c 0))
+(define airport-freq/c (and/c integer?
+                              (>=/c 108000)
+                              (<=/c 137000)))
 (define elevation/c real?)
 (define power/c (one-of/c 'low 'medium 'high))
 
