@@ -1,7 +1,7 @@
 #lang racket
 
 (require "country-codes.rkt" (for-syntax syntax/parse))
-(provide (except-out (all-defined-out) partial-struct-guard navigable-guards))
+(provide (all-defined-out))
 
 (define (nav-id/c x)
   (and (symbol? x)
@@ -20,37 +20,45 @@
 (define elevation/c real?)
 (define power/c (one-of/c 'low 'medium 'high))
 
-(define-syntax (partial-struct-guard stx)
-  (syntax-parse stx
-    [(_ name:id contracts ...)
-     #'(define-syntax (name s)
-         (syntax-parse s
-           [(_ other (... ...))
-            #'(struct-guard/c contracts ... other (... ...))]))]))
+(struct coord [lat lon])
+(define coord/c (struct/dc coord [lat latitude/c] [lon longitude/c]))
 
-(struct coord [lat lon]
-  #:guard (struct-guard/c latitude/c longitude/c))
+(struct navigable [name coordinates elevation country])
+(define navigable/c
+  (struct/dc navigable
+             [name nav-id/c]
+             [coordinates coord/c]
+             [elevation elevation/c]
+             [country country-code/c]))
 
-(partial-struct-guard navigable-guards nav-id/c coord? elevation/c country-code/c)
-(struct navigable [name coordinates elevation country]
-  #:guard (navigable-guards)
-  #;(struct-guard/c nav-id/c coord? country-code/c))
+(struct airport navigable [size radio])
+(define airport/c
+  (and/c navigable/c
+         (struct/dc airport
+                    [size size/c]
+                    [radio (hash/c string? airport-freq/c)])))
 
-(struct airport navigable [size radio]
-  #:guard (navigable-guards size/c (hash/c string? airport-freq/c))
-  #;(struct-guard/c nav-id/c coord? country-code/c
-                          size/c (hash/c string? airport-freq/c) elevation/c))
+(struct waypoint navigable [freq power])
+(define waypoint/c
+  (and/c navigable/c
+         (struct/dc waypoint
+                    [freq vor-freq/c]
+                    [power power/c])))
 
-(struct waypoint navigable [freq power]
-  #:guard (navigable-guards vor-freq/c))
+(struct vor waypoint [])
+(define vor/c
+  (and/c waypoint/c
+         (struct/dc vor)))
 
-(struct vor waypoint []
-  #:guard (navigable-guards vor-freq/c))
-(struct vor-dme vor []
-  #:guard (navigable-guards vor-freq/c))
+(struct vor-dme vor [])
+(define vor-dme/c
+  (and/c waypoint/c
+         (struct/dc vor-dme)))
 
-(define (nav-point/c x)
-  (or (airport? x) (waypoint? x)))
+(define nav-point/c
+  (or/c airport/c waypoint/c))
 
-(struct plan [start end sequence]
-  #:guard (struct-guard/c nav-id/c nav-id/c (listof nav-point/c)))
+(struct plan [sequence])
+(define plan/c
+  (struct/dc plan
+             [sequence (listof nav-point/c)]))
