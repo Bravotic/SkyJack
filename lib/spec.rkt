@@ -4,6 +4,8 @@
                                     "runtime-data.rkt"
                                     "country-codes.rkt"))
 
+(provide (all-defined-out))
+
 (begin-for-syntax
   ;; (symbol-table nav-id/c (ListOf NavIdSyntax))
   (define-persistent-symbol-table navigables)
