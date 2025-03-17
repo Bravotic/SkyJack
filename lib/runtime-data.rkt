@@ -20,7 +20,7 @@
        (<= x 118000)
        (integer? (/ x 50))))
 (define airport-freq/c (and/c integer?
-                              (>=/c 108000)
+                              (>=/c 118000)
                               (<=/c 137000)))
 (define elevation/c real?)
 (define power/c (one-of/c 'low 'medium 'high))

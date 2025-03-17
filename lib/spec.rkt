@@ -11,7 +11,7 @@
 (begin-for-syntax
   ;; (symbol-table nav-id/c (ListOf NavIdSyntax))
   (define-persistent-symbol-table navigables)
-  
+
   (define-syntax-class nav-id
     (pattern x:id
       #:fail-unless
