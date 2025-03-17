@@ -10,7 +10,7 @@
 
 (begin-for-syntax
   ;; (symbol-table nav-id/c (ListOf NavIdSyntax))
-  (define-persistent-symbol-table navigables)
+  ;(define-persistent-symbol-table navigables)
 
   (define-syntax-class nav-id
     (pattern x:id
@@ -58,16 +58,11 @@
     (pattern x:id
       #:fail-unless
       (country-code/c (syntax->datum #'x))
-      "Country code must be internationally recognized"))
-  #;(define-syntax-class plan
-      (pattern
-        (~or dst:nav-id
-             (srd:nav-id (~datum D->) rest:plan)))))
+      "Country code must be internationally recognized")))
 
 (define-syntax (define-airport stx)
   (syntax-parse stx
     [(_ id:nav-id
-        ;[name nav-id/c]
         (~alt
          (~once [(~datum coordinates) lat:latitude lon:longitude]
                 #:name "coordinates"
@@ -84,13 +79,7 @@
          (~once [(~datum radio) (name:string freq:airport-freq) ...]
                 #:name "radio"
                 #:too-few "Missing radio")
-         ) ...
-           #;[(~datum coordinates) lat:latitude lon:longitude]
-           #;[(~datum elevation) height:elevation]
-           #;[(~datum country) count:country]
-           #;[(~datum size) s:size]
-           #;[(~datum radio) (name:string freq:airport-freq) ...]
-           )
+         ) ...)
      #'(define id (airport 'id (coord lat lon) height 'count 's
                            (make-immutable-hash
                             (list (cons name (mghz->hertz freq)) ...))))]))
@@ -98,7 +87,6 @@
 (define-syntax (define-vor stx)
   (syntax-parse stx
     [(_ id:nav-id
-        ;[name nav-id/c]
         (~alt
          (~once [(~datum coordinates) lat:latitude lon:longitude]
                 #:name "coordinates"
@@ -115,12 +103,7 @@
          (~once [(~datum power) p:power]
                 #:name "power"
                 #:too-few "Missing power")
-         ) ...
-           #;[(~datum coordinates) lat:latitude lon:longitude]
-           #;[(~datum elevation) height:elevation]
-           #;[(~datum country) count:country]
-           #;[(~datum frequency) f:vor-freq]
-           #;[(~datum power) p:power])
+         ) ...)
      #'(define id (vor 'id (coord lat lon) height 'count (mghz->hertz f) 'p))]))
 
 (define-syntax (define-plan stx)
