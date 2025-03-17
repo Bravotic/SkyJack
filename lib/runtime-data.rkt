@@ -12,7 +12,7 @@
 
 (define size/c (one-of/c 'small 'medium 'large))
 
-(define (mghz->hertz x) (* x 1000))
+(define (mghz->hertz x) (floor (* x 1000)))
 
 (define (vor-freq/c x)
   (and (integer? x)
@@ -25,14 +25,16 @@
 (define elevation/c real?)
 (define power/c (one-of/c 'low 'medium 'high))
 
-(struct/contract coord ([lat latitude/c] [lon longitude/c]))
+(struct/contract coord ([lat latitude/c] [lon longitude/c])
+                 #:transparent)
 ;(struct coord [lat lon])
 ;(define coord/c (struct/dc coord [lat latitude/c] [lon longitude/c]))
 
 (struct/contract navigable ([name nav-id/c]
                             [coordinates coord?]
                             [elevation elevation/c]
-                            [country country-code/c]))
+                            [country country-code/c])
+                 #:transparent)
 ;(struct navigable [name coordinates elevation country])
 #;(define navigable/c
     (struct/dc navigable
@@ -42,7 +44,8 @@
                [country country-code/c]))
 
 (struct/contract airport navigable ([size size/c]
-                                    [radio (hash/c string? airport-freq/c)]))
+                                    [radio (hash/c string? airport-freq/c)])
+                 #:transparent)
 ;(struct airport navigable [size radio])
 #;(define airport/c
     (and/c navigable/c
@@ -51,7 +54,8 @@
                       [radio (hash/c string? airport-freq/c)])))
 
 (struct/contract waypoint navigable ([freq vor-freq/c]
-                                     [power power/c]))
+                                     [power power/c])
+                 #:transparent)
 ;(struct waypoint navigable [freq power])
 #;(define waypoint/c
     (and/c navigable/c
@@ -59,13 +63,15 @@
                       [freq vor-freq/c]
                       [power power/c])))
 
-(struct/contract vor waypoint ())
+(struct/contract vor waypoint ()
+                 #:transparent)
 ;(struct vor waypoint [])
 #;(define vor/c
     (and/c waypoint/c
            (struct/dc vor)))
 
-(struct/contract vor-dme vor ())
+(struct/contract vor-dme vor ()
+                 #:transparent)
 ;(struct vor-dme vor [])
 #;(define vor-dme/c
     (and/c waypoint/c
@@ -75,7 +81,8 @@
   (or/c airport? waypoint?)
   #;(or/c airport/c waypoint/c))
 
-(struct/contract plan ([sequence (listof nav-point?)]))
+(struct/contract plan ([sequence (listof nav-point?)])
+                 #:transparent)
 ;(struct plan [sequence])
 #;(define plan/c
     (struct/dc plan

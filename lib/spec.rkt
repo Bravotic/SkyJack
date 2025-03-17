@@ -1,8 +1,10 @@
 #lang racket
 
-(require syntax-spec-v3 (for-syntax syntax/parse
-                                    "runtime-data.rkt"
-                                    "country-codes.rkt"))
+(require syntax-spec-v3
+         "runtime-data.rkt"
+         (for-syntax syntax/parse
+                     "runtime-data.rkt"
+                     "country-codes.rkt"))
 
 (provide (all-defined-out))
 
@@ -56,42 +58,84 @@
     (pattern x:id
       #:fail-unless
       (country-code/c (syntax->datum #'x))
-      "Country code must be internationally recognized")))
+      "Country code must be internationally recognized"))
+  #;(define-syntax-class plan
+      (pattern
+        (~or dst:nav-id
+             (srd:nav-id (~datum D->) rest:plan)))))
 
 (define-syntax (define-airport stx)
   (syntax-parse stx
     [(_ id:nav-id
         ;[name nav-id/c]
-        [(~datum coordinates) lat:latitude lon:longitude]
-        [(~datum elevation) height:elevation]
-        [(~datum country) count:country]
-        [(~datum size) s:size]
-        [(~datum radio) (name:id freq:airport-freq) ...]
-        )
-     #''TODO]))
+        (~alt
+         (~once [(~datum coordinates) lat:latitude lon:longitude]
+                #:name "coordinates"
+                #:too-few "Missing coordinates")
+         (~once [(~datum elevation) height:elevation]
+                #:name "elevation"
+                #:too-few "Missing elevation")
+         (~once [(~datum country) count:country]
+                #:name "country"
+                #:too-few "Missing country")
+         (~once [(~datum size) s:size]
+                #:name "size"
+                #:too-few "Missing size")
+         (~once [(~datum radio) (name:string freq:airport-freq) ...]
+                #:name "radio"
+                #:too-few "Missing radio")
+         ) ...
+           #;[(~datum coordinates) lat:latitude lon:longitude]
+           #;[(~datum elevation) height:elevation]
+           #;[(~datum country) count:country]
+           #;[(~datum size) s:size]
+           #;[(~datum radio) (name:string freq:airport-freq) ...]
+           )
+     #'(define id (airport 'id (coord lat lon) height 'count 's
+                           (make-immutable-hash
+                            (list (cons name (mghz->hertz freq)) ...))))]))
 
 (define-syntax (define-vor stx)
   (syntax-parse stx
     [(_ id:nav-id
         ;[name nav-id/c]
-        [(~datum coordinates) lat:latitude lon:longitude]
-        [(~datum elevation) height:elevation]
-        [(~datum country) count:country]
-        [(~datum freq) f:vor-freq]
-        [(~datum power) p:power])
-     #''TODO]))
+        (~alt
+         (~once [(~datum coordinates) lat:latitude lon:longitude]
+                #:name "coordinates"
+                #:too-few "Missing coordinates")
+         (~once [(~datum elevation) height:elevation]
+                #:name "elevation"
+                #:too-few "Missing elevation")
+         (~once [(~datum country) count:country]
+                #:name "country"
+                #:too-few "Missing country")
+         (~once [(~datum frequency) f:vor-freq]
+                #:name "frequency"
+                #:too-few "Missing frequency")
+         (~once [(~datum power) p:power]
+                #:name "power"
+                #:too-few "Missing power")
+         ) ...
+           #;[(~datum coordinates) lat:latitude lon:longitude]
+           #;[(~datum elevation) height:elevation]
+           #;[(~datum country) count:country]
+           #;[(~datum frequency) f:vor-freq]
+           #;[(~datum power) p:power])
+     #'(define id (vor 'id (coord lat lon) height 'count (mghz->hertz f) 'p))]))
 
 (define-syntax (define-plan stx)
   (syntax-parse stx
     [(_ plan-name:id route-parts ...)
-     (compile-plan (attribute route-parts))]))
+     #`(define plan-name (plan #,(compile-plan (attribute route-parts))))]))
 
 (begin-for-syntax
+  ;; plan := nav-id
+  ;;       | nav-id D-> plan
   ;; PlanSyntax -> plan/c
   (define (compile-plan route)
     (syntax-parse route
       #:datum-literals (D->)
-      [(dest:nav-id) #''TODO]
-      [(src:nav-id D-> rest)
+      [(dest:nav-id) #'(list dest)]
+      [(src:nav-id D-> rest ...)
        #`(cons src #,(compile-plan (attribute rest)))])))
 
