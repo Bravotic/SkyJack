@@ -17,6 +17,20 @@
   (-> airport-text-generator/c vor-text-generator/c plan? string?)
   (string-join (map (curry navigable-generate-text-report airport/g vor/g) (plan-sequence plan)) "\n"))
 
+(define/contract (arbitrary-generate-report plan airport-gen vor-gen combiner)
+  (-> plan?
+      (-> airport? any/c #;X)
+      (-> vor? any/c #;X)
+      (-> (listof any/c #;X) any/c #;Y)
+      any/c #;Y)
+  (combiner
+   (map
+    (λ (nv)
+      (match nv
+        [(? airport? a) (airport-gen a)]
+        [(? vor? a) (vor-gen a)]))
+    (plan-sequence plan))))
+
 (provide plan-generate-text-report)
 
 (module+ test
@@ -38,12 +52,12 @@
      ("Clearance" 121.65)
      ("Ramp" 134.05)])
 
-    (define-vor PVD
-      [coordinates 41.5564002990723 -71.999397277832]
-      [elevation 310]
-      [country US]
-      [frequency 110.0]
-      [power high])
+  (define-vor PVD
+    [coordinates 41.5564002990723 -71.999397277832]
+    [elevation 310]
+    [country US]
+    [frequency 110.0]
+    [power high])
 
   (define-plan boston-pvd-boston KBOS D-> PVD D-> KBOS)
     

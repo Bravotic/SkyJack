@@ -52,6 +52,10 @@
            (struct/dc airport
                       [size size/c]
                       [radio (hash/c string? airport-freq/c)])))
+(define airport-name navigable-name)
+(define airport-coordinates navigable-coordinates)
+(define airport-elevation navigable-elevation)
+(define airport-country navigable-country)
 
 (struct/contract waypoint navigable ([freq vor-freq/c]
                                      [power power/c])
@@ -62,6 +66,10 @@
            (struct/dc waypoint
                       [freq vor-freq/c]
                       [power power/c])))
+(define waypoint-name navigable-name)
+(define waypoint-coordinates navigable-coordinates)
+(define waypoint-elevation navigable-elevation)
+(define waypoint-country navigable-country)
 
 (struct/contract vor waypoint ()
                  #:transparent)
@@ -69,6 +77,12 @@
 #;(define vor/c
     (and/c waypoint/c
            (struct/dc vor)))
+(define vor-freq waypoint-freq)
+(define vor-power waypoint-power)
+(define vor-name waypoint-name)
+(define vor-coordinates waypoint-coordinates)
+(define vor-elevation waypoint-elevation)
+(define vor-country waypoint-country)
 
 (struct/contract vor-dme vor ()
                  #:transparent)
@@ -76,6 +90,12 @@
 #;(define vor-dme/c
     (and/c waypoint/c
            (struct/dc vor-dme)))
+(define vor-dme-freq vor-freq)
+(define vor-dme-power vor-power)
+(define vor-dme-name vor-name)
+(define vor-dme-coordinates vor-coordinates)
+(define vor-dme-elevation vor-elevation)
+(define vor-dme-country vor-country)
 
 (define nav-point?
   (or/c airport? waypoint?)
