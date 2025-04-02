@@ -1,8 +1,8 @@
 #lang racket
 
-(require "../lib/spec.rkt" "../lib/runtime-data.rkt")
+(require "../lib/spec.rkt" "../lib/runtime-data.rkt" "../lib/runtime-functions.rkt")
 
-
+;; TODO: update expansions
 (define-airport KBOS
   [coordinates 42.36197 -71.0079]
   [elevation 20]
@@ -24,12 +24,12 @@
      'large
      (make-immutable-hash
       (list
-       (cons "D-ATIS" (mghz->hertz 135.0) #;135000)
-       (cons "Tower East" (mghz->hertz 132.225) #;132225)
-       (cons "Tower West" (mghz->hertz 128.8) #;128800)
-       (cons "Ground" (mghz->hertz 121.75) #;121750)
-       (cons "Clearance" (mghz->hertz 121.65) #;121650)
-       (cons "Ramp" (mghz->hertz 134.05) #;134050)
+       (cons "D-ATIS" (mghz->khz 135.0) #;135000)
+       (cons "Tower East" (mghz->khz 132.225) #;132225)
+       (cons "Tower West" (mghz->khz 128.8) #;128800)
+       (cons "Ground" (mghz->khz 121.75) #;121750)
+       (cons "Clearance" (mghz->khz 121.65) #;121650)
+       (cons "Ramp" (mghz->khz 134.05) #;134050)
        ))))
 
 (define-airport KJFK
@@ -52,11 +52,11 @@
      'large
      (make-immutable-hash
       (list
-       (cons "D-ATIS" (mghz->hertz 128.725))
-       (cons "Tower" (mghz->hertz 119.1))
-       (cons "Tower Alt" (mghz->hertz 123.9))
-       (cons "Ground" (mghz->hertz 121.9))
-       (cons "Clearance" (mghz->hertz 135.05))))))
+       (cons "D-ATIS" (mghz->khz 128.725))
+       (cons "Tower" (mghz->khz 119.1))
+       (cons "Tower Alt" (mghz->khz 123.9))
+       (cons "Ground" (mghz->khz 121.9))
+       (cons "Clearance" (mghz->khz 135.05))))))
 
 (define-vor PVD
   [coordinates 41.7243003845215 -71.4296035766602]
@@ -67,7 +67,7 @@
 #;(define PVD (vor 'PVD (coord 41.7243003845215 -71.4296035766602)
                    49
                    'US
-                   (mghz->hertz 115.6) #;115600
+                   (mghz->khz 115.6) #;115600
                    'high))
 
 (define-vor ORW
@@ -79,7 +79,7 @@
 #;(define ORW (vor 'ORW (coord 41.5564002990723 -71.999397277832)
                    310
                    'US
-                   (mghz->hertz 110.0) #;110000
+                   (mghz->khz 110.0) #;110000
                    'high))
 (define-vor CCC
   [coordinates 40.9295997619629 -72.7988967895508]
@@ -90,7 +90,7 @@
 #;(define CCC (vor 'CCC (coord 40.9295997619629 -72.7988967895508)
                    86
                    'US
-                   (mghz->hertz 117.2) #;117200
+                   (mghz->khz 117.2) #;117200
                    'medium))
 
 (define-plan boston-to-new-york-city

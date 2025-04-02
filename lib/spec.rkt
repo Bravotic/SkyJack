@@ -2,15 +2,22 @@
 
 (require syntax-spec-v3
          "runtime-data.rkt"
+         "runtime-functions.rkt"
          (for-syntax syntax/parse
+                     syntax/id-table
                      "runtime-data.rkt"
+                     "runtime-functions.rkt"
                      "country-codes.rkt"))
 
 (provide (all-defined-out))
 
 (begin-for-syntax
-  ;; (symbol-table nav-id/c (ListOf NavIdSyntax))
-  ;(define-persistent-symbol-table navigables)
+  ;; (symbol-table NavIdSyntax Coord)
+  (define navigable-coords (make-free-id-table))
+  ;; (symbol-table PlanIdSyntax (cons Coord Coord))
+  (define plan-coords (make-free-id-table))
+  ;; maximum distance between navigable points in a plan in nautical miles
+  (define MAX-JUMP 100)
 
   (define-syntax-class nav-id
     (pattern x:id
@@ -37,12 +44,12 @@
   (define-syntax-class vor-freq
     (pattern x:number
       #:fail-unless
-      (vor-freq/c (mghz->hertz (syntax->datum #'x)))
+      (vor-freq/c (mghz->khz (syntax->datum #'x)))
       "Vor frequency must be in the range of 108-118MHz in increments of 0.05MHz"))
   (define-syntax-class airport-freq
     (pattern x:number
       #:fail-unless
-      (airport-freq/c (mghz->hertz (syntax->datum #'x)))
+      (airport-freq/c (mghz->khz (syntax->datum #'x)))
       "Airport frequency must be in the air band"))
   (define-syntax-class elevation
     (pattern x:number
@@ -80,9 +87,14 @@
                 #:name "radio"
                 #:too-few "Missing radio")
          ) ...)
-     #'(define id (airport 'id (coord lat lon) height 'count 's
-                           (make-immutable-hash
-                            (list (cons name (mghz->hertz freq)) ...))))]))
+     #;(free-id-table-set! navigable-coords #'id (coord (syntax->datum #'lat)
+                                                        (syntax->datum #'lon)))
+     #'(begin
+         (define id (airport 'id (coord lat lon) height 'count 's
+                             (make-immutable-hash
+                              (list (cons name (mghz->khz freq)) ...))))
+         (begin-for-syntax
+           (free-id-table-set! navigable-coords #'id (coord lat lon))))]))
 
 (define-syntax (define-vor stx)
   (syntax-parse stx
@@ -104,21 +116,106 @@
                 #:name "power"
                 #:too-few "Missing power")
          ) ...)
-     #'(define id (vor 'id (coord lat lon) height 'count (mghz->hertz f) 'p))]))
+     #;(free-id-table-set! navigable-coords #'id (coord (syntax->datum #'lat)
+                                                        (syntax->datum #'lon)))
+     #'(begin
+         (define id (vor 'id (coord lat lon) height 'count (mghz->khz f) 'p))
+         (begin-for-syntax
+           (free-id-table-set! navigable-coords #'id (coord lat lon))))]))
 
 (define-syntax (define-plan stx)
   (syntax-parse stx
     [(_ plan-name:id route-parts ...)
-     #`(define plan-name (plan #,(compile-plan (attribute route-parts))))]))
+     (define route-eles (compile-plan (attribute route-parts)))
+     (check-max-distance! route-eles)
+     (define/syntax-parse (nav ...)
+       route-eles)
+     (define plan-loc (get-plan-coords route-eles))
+     (define plan-src (car plan-loc))
+     (define plan-dst (cdr plan-loc))
+     (define plan-src-lat (coord-lat plan-src))
+     (define plan-src-lon (coord-lon plan-src))
+     (define plan-dst-lat (coord-lat plan-dst))
+     (define plan-dst-lon (coord-lon plan-dst))
+     #`(begin
+         (define plan-name (plan (expand-plans (list nav ...))))
+         (begin-for-syntax
+           (free-id-table-set! plan-coords #'plan-name
+                               (cons (coord #,plan-src-lat #,plan-src-lon)
+                                     (coord #,plan-dst-lat #,plan-dst-lon)))))]))
 
 (begin-for-syntax
   ;; plan := nav-id
   ;;       | nav-id D-> plan
-  ;; PlanSyntax -> plan/c
+  ;; PlanSyntax -> (List NavIdSyntax)
   (define (compile-plan route)
     (syntax-parse route
       #:datum-literals (D->)
-      [(dest:nav-id) #'(list dest)]
-      [(src:nav-id D-> rest ...)
-       #`(cons src #,(compile-plan (attribute rest)))])))
+      [(dest:id) (list #'dest)]
+      [(src:id D-> rest ...)
+       (cons #'src (compile-plan (attribute rest)))]))
+
+  ;; Errors if any nav-ids are farther than the max distance to the next navigable
+  ;; (List NavIdSyntax) -> Void
+  (define (check-max-distance! plan-eles)
+    (cond [(and (pair? plan-eles)
+                (pair? (cdr plan-eles)))
+           (check-dist! (car plan-eles) (car (cdr plan-eles)))
+           (check-max-distance! (cdr plan-eles))]
+          [else (void)]))
+
+  ;; (Union NavIdSyntax PlanIdSyntax) (Union NavIdSyntax PlanIdSyntax) -> Void
+  (define (check-dist! src dst)
+    (let ([src-loc (get-dst-coords src)]
+          [dst-loc (get-src-coords dst)])
+      (unless (closer-than src-loc dst-loc MAX-JUMP)
+        (raise-syntax-error
+         'plan
+         (format "Plan segment makes a jump longer than ~a nautical miles: ~a"
+                 MAX-JUMP
+                 (distance-between src-loc dst-loc))
+         src
+         dst))))
+
+  ;; (Union NavIdSyntax PlanIdSyntax) -> Coord
+  (define (get-src-coords path-ele)
+    (free-id-table-ref
+     navigable-coords path-ele
+     (λ () (car (free-id-table-ref
+                 plan-coords path-ele
+                 (λ () (raise-syntax-error
+                        'plan
+                        "Plan segment is not a predefined navigable or plan"
+                        path-ele)))))))
+  ;; (Union NavIdSyntax PlanIdSyntax) -> Coord
+  (define (get-dst-coords path-ele)
+    (free-id-table-ref
+     navigable-coords path-ele
+     (λ () (cdr (free-id-table-ref
+                 plan-coords path-ele
+                 (λ () (raise-syntax-error
+                        'plan
+                        "Plan segment is not a predefined navigable or plan"
+                        path-ele)))))))
+  
+  ;; (List NavIdSyntax) -> (Cons Coord Coord)
+  (define (get-plan-coords plan-eles)
+    (cons
+     (get-src-coords (first-ele plan-eles))
+     (get-dst-coords (last-ele plan-eles))))
+  
+  ;; (List NavIdSyntax) -> NavIdSyntax
+  (define (first-ele plan-eles)
+    (if (pair? plan-eles)
+        (car plan-eles)
+        (error 'plan "empty plan")))
+  
+  ;; (List NavIdSyntax) -> NavIdSyntax
+  (define (last-ele plan-eles)
+    (cond [(and (pair? plan-eles)
+                (null? (cdr plan-eles)))
+           (car plan-eles)]
+          [(pair? plan-eles)
+           (last-ele (cdr plan-eles))]
+          [else (error 'plan "empty plan")])))
 
