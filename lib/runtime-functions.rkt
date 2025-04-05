@@ -38,3 +38,33 @@
                  (plan-sequence pon)
                  pon))
     lon)))
+
+;; Produce the readable string of the given coordinates
+(define/contract (coord->string c)
+  (-> coord? string?)
+  (define (dms n)
+    (let* ([deg (floor n)]
+           [min-degs (* (- n deg) 60)]
+           [min (floor min-degs)]
+           [sec (* (- min-degs min) 60)])
+      (values deg min sec)))
+  (let* ([lat (coord-lat c)]
+         [lon (coord-lon c)]
+         [ns (if (< lat 0) "S" "N")]
+         [ew (if (< lon 0) "W" "E")])
+    (let-values ([(lat-deg lat-min lat-sec) (dms (abs lat))]
+                 [(lon-deg lon-min lon-sec) (dms (abs lon))])
+      (format "~a° ~a' ~a\" ~a, ~a° ~a' ~a\" ~a"
+              lat-deg lat-min lat-sec ns
+              lon-deg lon-min lon-sec ew))))
+
+;; Produce a string representing a hash of radio frequencies
+(define/contract (radios->string radios)
+  (-> (hash/c string? number?) string?)
+  (string-join
+   (for/list ([(name freq) (in-hash radios)])
+     (format
+      "~a: ~a MHz"
+      name
+      (khz->mghz freq)))
+   "\n"))

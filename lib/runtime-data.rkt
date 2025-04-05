@@ -13,6 +13,7 @@
 (define size/c (one-of/c 'small 'medium 'large))
 
 (define (mghz->khz x) (floor (* x 1000)))
+(define (khz->mghz x) (/ x 1000.))
 
 (define (vor-freq/c x)
   (and (integer? x)
