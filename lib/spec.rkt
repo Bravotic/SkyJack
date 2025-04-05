@@ -125,18 +125,13 @@
 
 (define-syntax (define-plan stx)
   (syntax-parse stx
-    [(_ plan-name:id route-parts ...)
+    [(_ plan-name:id route-parts ...+)
      (define route-eles (compile-plan (attribute route-parts)))
      (check-max-distance! route-eles)
+     (define-values (plan-src-lat plan-src-lon plan-dst-lat plan-dst-lon)
+       (get-plan-coords route-eles))
      (define/syntax-parse (nav ...)
        route-eles)
-     (define plan-loc (get-plan-coords route-eles))
-     (define plan-src (car plan-loc))
-     (define plan-dst (cdr plan-loc))
-     (define plan-src-lat (coord-lat plan-src))
-     (define plan-src-lon (coord-lon plan-src))
-     (define plan-dst-lat (coord-lat plan-dst))
-     (define plan-dst-lon (coord-lon plan-dst))
      #`(begin
          (define plan-name (plan (expand-plans (list nav ...))))
          (begin-for-syntax
@@ -198,11 +193,13 @@
                         "Plan segment is not a predefined navigable or plan"
                         path-ele)))))))
   
-  ;; (List NavIdSyntax) -> (Cons Coord Coord)
+  ;; (List NavIdSyntax) -> (values lat lon lat lon)
+  ;; evaluates to the src-lat src-lon dst-lat dst-lon
   (define (get-plan-coords plan-eles)
-    (cons
-     (get-src-coords (first-ele plan-eles))
-     (get-dst-coords (last-ele plan-eles))))
+    (let ([src (get-src-coords (first-ele plan-eles))]
+          [dst (get-dst-coords (last-ele plan-eles))])
+      (values (coord-lat src) (coord-lon src)
+              (coord-lat dst) (coord-lon dst))))
   
   ;; (List NavIdSyntax) -> NavIdSyntax
   (define (first-ele plan-eles)
