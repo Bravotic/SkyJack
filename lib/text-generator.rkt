@@ -60,15 +60,13 @@
     [(_ (~alt
          (~once [(~datum airport) e-air:airport-params ...])
          (~once [(~datum vor) e-vor:vor-params ...])) ...)
-     (define/syntax-parse air-var #'air)
      (define/syntax-parse (v-air ...)
-       (map (λ (p) (transform-params #'air-var p)) (attribute e-air)))
-     (define/syntax-parse vor-var #'vr)
+       (map (λ (p) (transform-params #'air p)) (attribute e-air)))
      (define/syntax-parse (v-vor ...)
-       (map (λ (p) (transform-params #'vor-var p)) (attribute e-vor)))
+       (map (λ (p) (transform-params #'vr p)) (attribute e-vor)))
      #'(λ (plan)
          (plan-generate-text-report
-          (λ (air-var)
+          (λ (air)
             (string-append v-air ...))
           (λ (vr)
             (string-append v-vor ...))
