@@ -101,6 +101,7 @@
 
 (module+ test
   (require rackunit)
+  (require syntax/macro-testing)
   (require "./spec.rkt")
 
   (define (airport-name a) (symbol->string (navigable-name a)))
@@ -140,4 +141,68 @@
   ; plan-text-generate-report is able to generate a report for multiple navigables on a plan.
   (check-equal?
    (plan-generate-text-report airport-name airport-name boston-pvd-boston)
-   "KBOS\nPVD\nKBOS"))
+   "KBOS\nPVD\nKBOS")
+
+  ; Test make text generator calls correct generator lambda for type
+  (check-equal?
+   ((make-text-report-generator
+     [airport "airport"]
+     [vor "vor"])
+    boston-pvd-boston)
+   "airport\nvor\nairport")
+  
+  ; Test transforming params happens correctly.
+  
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'name))
+   '(symbol->string (navigable-name KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'coordinates))
+   '(coord->string (navigable-coordinates KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'latitude))
+   '(number->string (coord-lat (navigable-coordinates KBOS))))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'longitude))
+   '(number->string (coord-lon (navigable-coordinates KBOS))))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'elevation))
+   '(format "~a ft" (navigable-elevation KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'country))
+   '(symbol->string (navigable-country KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'size))
+   '(symbol->string (airport-size KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'country))
+   '(symbol->string (navigable-country KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'KBOS #'radio))
+   '(radios->string (airport-radio KBOS)))
+
+  (check-equal?
+   (phase1-eval (transform-params #'PVD #'freq))
+   '(format "~a MHz" (khz->mghz (waypoint-freq PVD))))
+
+  (check-equal?
+   (phase1-eval (transform-params #'PVD #'power))
+   '(symbol->string (waypoint-power PVD)))
+  
+  ; Test make-text-generator calls transformers
+
+  (check-equal?
+   ((make-text-report-generator
+    [airport name]
+    [vor power])
+    boston-pvd-boston)
+   "KBOS\nhigh\nKBOS")
+  )
