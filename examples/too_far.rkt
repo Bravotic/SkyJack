@@ -75,12 +75,16 @@
   KBOS
   D-> PSM)
 
+(define-plan cali
+ SFO)
+
 (define-plan boston-to-bangor
   boston-north-departure
   D-> ENE
   D-> AUG
   D-> BGR
   D-> SFO
+  ;D-> cali
   D-> KBGR)
 
 (define-plan boston-to-concord
