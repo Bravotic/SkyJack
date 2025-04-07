@@ -102,6 +102,7 @@ Airport Declarations
 
     +----------------------------------------------------------------------+
     | (define-airport <nav-id>                                             |
+    |                 [country <ISO 3166-1 alpha-2 country code>]          |
     |                 [size <small | medium | large>]                      |
     |                 [radio (<name> <frequency>) ...]                     |
     |                 [coordinates <latitude> <longitude>]                 |
@@ -114,6 +115,7 @@ VOR Declarations
 
     +----------------------------------------------------------------------+
     | (define-vor <nav-id>                                                 |
+    |             [country <ISO 3166-1 alpha-2 country code>]              |
     |             [frequency <frequency>]                                  |
     |             [power <low | medium | high>]                            |
     |             [elevation <feet>]                                       |
@@ -155,6 +157,7 @@ Simple valid program
     +----------------------------------------------------------------------+
     | (define-airport KBOS                                                 |
     |   [size large]                                                       |
+    |   [country US]                                                       |
     |   [radio                                                             |
     |         ("D-ATIS" 135.0)                                             |
     |         ("Tower East" 132.225)                                       |
@@ -165,6 +168,7 @@ Simple valid program
     |   [coordinates 42.36197 -71.0079]                                    |
     |   [elevation 20])                                                    |
     | (define-airport KJFK                                                 |
+    |   [country US]                                                       |
     |   [size large]                                                       |
     |   [radio                                                             |
     |         ("D-ATIS" 115.1)                                             |
@@ -176,16 +180,19 @@ Simple valid program
     |   [elevation 13])                                                    |
     |                                                                      |
     | (define-vor PVD                                                      |
+    |   [country US]                                                       |
     |   [frequency 115.6]                                                  |
     |   [power high]                                                       |
     |   [elevation 49]                                                     |
     |   [coordinates 41.7243003845215 -71.4296035766602])                  |
     | (define-vor ORW                                                      |
+    |   [country US]                                                       |
     |   [frequency 110.0]                                                  |
     |   [power high]                                                       |
     |   [elevation 310]                                                    |
     |   [coordinates 41.5564002990723 -71.999397277832])                   |
     | (define-vor CCC                                                      |
+    |   [country US]                                                       |
     |   [frequency 117.2]                                                  |
     |   [power medium]                                                     |
     |   [elevation 86]                                                     |
@@ -198,12 +205,18 @@ Simple valid program
     |   D-> CCC                                                            |
     |   D-> KJFK)                                                          |
     |                                                                      |
+    | (define generate-report                                              |
+    |   (make-text-report-generator                                        |
+    |     [airport name]                                                   |
+    |     [vor name]))                                                     |
+    |                                                                      |
     | (generate-report boston-to-new-york-city)                            |
     +----------------------------------------------------------------------+
 
 Program with compile time errors, but syntactically valid
     +----------------------------------------------------------------------+
     | (define-airport KBOS                                                 |
+    |   [country US]                                                       |
     |   [size large]                                                       |
     |   [radio                                                             |
     |         ("D-ATIS" 135.0)                                             |
@@ -215,6 +228,7 @@ Program with compile time errors, but syntactically valid
     |   [coordinates 42.36197 -71.0079]                                    |
     |   [elevation 20])                                                    |
     | (define-airport KBGR                                                 |
+    |   [country US]                                                       |
     |   [size medium]                                                      |
     |   [radio                                                             |
     |         ("D-ATIS" 127.75)                                            |
@@ -224,6 +238,7 @@ Program with compile time errors, but syntactically valid
     |   [coordinates 44.8074 -68.828102]                                   |
     |   [elevation 192])                                                   |
     | (define-airport KCON                                                 |
+    |   [country US]                                                       |
     |   [size medium]                                                      |
     |   [radio                                                             |
     |         ("Approach/Departure" 127.35)                                |
@@ -233,31 +248,37 @@ Program with compile time errors, but syntactically valid
     |   [elevation 342])                                                   |
     |                                                                      |
     | (define-vor PSM                                                      |
+    |   [country US]                                                       |
     |   [frequency 116.5]                                                  |
     |   [power medium]                                                     |
     |   [elevation 99]                                                     |
     |   [coordinates 43.0844993591309 -70.8320007324219])                  |
     | (define-vor ENE                                                      |
+    |   [country US]                                                       |
     |   [frequency 117.1]                                                  |
     |   [power high]                                                       |
     |   [elevation 190]                                                    |
     |   [coordinates 43.4257011413574 -70.6135025024414])                  |
     | (define-vor AUG                                                      |
+    |   [country US]                                                       |
     |   [frequency 111.4]                                                  |
     |   [power medium]                                                     |
     |   [elevation 349]                                                    |
     |   [coordinates 44.3199996948242 -69.7966003417969])                  |
     | (define-vor BGR                                                      |
+    |   [country US]                                                       |
     |   [frequency 114.8]                                                  |
     |   [power high]                                                       |
     |   [elevation 359]                                                    |
     |   [coordinates 44.8418006896973 -68.8740005493164])                  |
     | (define-vor SFO                                                      |
+    |   [country US]                                                       |
     |   [frequency 115.8]                                                  |
     |   [power medium]                                                     |
     |   [elevation 13]                                                     |
     |   [coordinates 37.619499206543 -122.374000549316])                   |
     | (define-vor CON                                                      |
+    |   [country US]                                                       |
     |   [frequency 112.9]                                                  |
     |   [power medium]                                                     |
     |   [elevation 710]                                                    |
@@ -279,6 +300,11 @@ Program with compile time errors, but syntactically valid
     |       boston-north-departure                                         |
     |   D-> CON                                                            |
     |   D-> KCON)                                                          |
+    |                                                                      |
+    | (define generate-report                                              |
+    |   (make-text-report-generator                                        |
+    |     [airport name]                                                   |
+    |     [vor name]))                                                     |
     |                                                                      |
     | (generate-report boston-to-bangor)                                   |
     | (generate-report boston-to-concord)                                  |
