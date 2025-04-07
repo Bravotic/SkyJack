@@ -1,6 +1,8 @@
 #lang racket
 
-(require "../lib/spec.rkt")
+(require "../lib/spec.rkt" "../lib/text-generator.rkt")
+
+(provide (all-defined-out))
 
 (define-airport KBOS
   [size large]
@@ -86,3 +88,19 @@
   boston-north-departure
   D-> CON
   D-> KCON)
+
+(define make-report
+  (make-text-report-generator
+   [airport name ":\n"
+            elevation " - " coordinates "\n"
+            (radio "Clearance") "\n"
+            "----------------------------------------------"]
+   [vor name ":\n"
+        country " - " power "\n"
+        "----------------------------------------------"]))
+
+(display (make-report boston-to-bangor))
+(display "\n\n\n")
+(display (make-report boston-to-concord))
+
+
