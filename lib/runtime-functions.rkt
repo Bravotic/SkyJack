@@ -68,3 +68,11 @@
       name
       (khz->mghz freq)))
    "\n"))
+
+;; Check if a plan is complete
+(define/contract (plan-complete? p)
+  (-> plan? boolean?)
+  (let ([src (first (plan-sequence p))]
+        [dst (last (plan-sequence p))])
+    (and (airport? src)
+         (airport? dst))))

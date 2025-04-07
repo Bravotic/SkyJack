@@ -17,12 +17,12 @@
 
 ; Generates text for a whole plan, joining the text of each navigable with the newline character.
 (define/contract (plan-generate-text-report airport/g vor/g plan)
-  (-> airport-text-generator/c vor-text-generator/c plan? string?)
+  (-> airport-text-generator/c vor-text-generator/c (and/c plan? plan-complete?) string?)
   (string-join (map (curry navigable-generate-text-report airport/g vor/g) (plan-sequence plan))
                "\n"))
 
 (define/contract (arbitrary-generate-report plan airport-gen vor-gen combiner)
-  (-> plan?
+  (-> (and/c plan? plan-complete?)
       (-> airport? any/c #;X)
       (-> vor? any/c #;X)
       (-> (listof any/c #;X) any/c #;Y)
@@ -64,13 +64,15 @@
        (map (λ (p) (transform-params #'air p)) (attribute e-air)))
      (define/syntax-parse (v-vor ...)
        (map (λ (p) (transform-params #'vr p)) (attribute e-vor)))
-     #'(λ (plan)
-         (plan-generate-text-report
-          (λ (air)
-            (string-append v-air ...))
-          (λ (vr)
-            (string-append v-vor ...))
-          plan))]))
+     #`(λ (plan)
+         #,(syntax/loc
+               stx
+             (plan-generate-text-report
+              (λ (air)
+                (string-append v-air ...))
+              (λ (vr)
+                (string-append v-vor ...))
+              plan)))]))
 
 (define-for-syntax (transform-params navigable param)
   (syntax-parse param
@@ -201,8 +203,8 @@
 
   (check-equal?
    ((make-text-report-generator
-    [airport name]
-    [vor power])
+     [airport name]
+     [vor power])
     boston-pvd-boston)
    "KBOS\nhigh\nKBOS")
   )
