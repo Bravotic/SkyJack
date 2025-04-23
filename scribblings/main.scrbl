@@ -140,4 +140,49 @@ Since flight plans can contain other flight plans, similar portions of plans can
   D-> KCON)
 ]
 
+@section["Report generation"]
 
+After making a flight plan, SkyJack gives you the tools to generate textual reports of the flight plan.
+
+@defform[#:literals (airport vor name coordinates latitude longitude elevation country size radio freq power)
+         (make-text-report-generator
+          [airport
+           format-string ...]
+          [vor
+           format-string ...])
+         #:grammar
+         [(format-string name
+                         coordinates
+                         latitude
+                         longitude
+                         elevation
+                         country
+                         size
+                         radio
+                         (radio channel-name)
+                         freq
+                         power
+                         string?)]]{Creates a generator which applies the given format to a given plan. Returns a function which
+                                            takes one argument and returns a string.}
+
+The following is a basic example of a flight plan text report generator:
+
+@racketblock[
+(define basic-report
+  (make-text-report-generator
+   [airport name ":\n"
+            elevation " - " coordinates "\n"
+            (radio "Clearance") "\n"
+            "----------------------------------------------"]
+   [vor name ":\n"
+        country " - " power "\n"
+        "----------------------------------------------"]))
+]
+
+Once defined, the report generator can be used as follows:
+
+@racketblock[
+(display (basic-report boston-to-bangor))
+(display "\n\n\n")
+(display (basic-report boston-to-concord))
+]
