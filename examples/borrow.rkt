@@ -8,3 +8,5 @@
   boston-north-departure
   D-> AUG
   D-> KBGR)
+
+(display (make-report short-flight))

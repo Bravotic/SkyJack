@@ -3,6 +3,8 @@
 (require "../lib/spec.rkt" "../lib/text-generator.rkt"
          "../lib/runtime-data.rkt" "../lib/runtime-functions.rkt")
 
+(provide (all-defined-out))
+
 (define-airport KBOS
   [coordinates 42.36197 -71.0079]
   [elevation 20]

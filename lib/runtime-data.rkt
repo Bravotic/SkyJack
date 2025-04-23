@@ -1,7 +1,8 @@
 #lang racket
 
 (require "country-codes.rkt" (for-syntax syntax/parse))
-(provide (all-defined-out))
+(provide (all-defined-out)
+         (all-from-out "country-codes.rkt"))
 
 (define (nav-id/c x)
   (and (symbol? x)

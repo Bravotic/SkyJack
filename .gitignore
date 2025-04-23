@@ -6,3 +6,4 @@ compiled/
 scribblings/*.js
 scribblings/*.css
 scribblings/*.html
+/doc/

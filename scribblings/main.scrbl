@@ -5,9 +5,10 @@
          scribble/example]
 
 @(define eval (make-base-eval '(require racket
-                                        skyjack/lib/spec
-                                        skyjack/lib/runtime-data
-                                        skyjack/lib/runtime-functions)))
+                                        skyjack
+                                        "scribblings/nav-definitions.rkt"
+                                        "scribblings/plan-definitions.rkt"
+                                        "scribblings/report-definitions.rkt")))
 
 @title{SkyJack: A language for flight plans}
 @author["Alexander Chang-Davidson, Collin McKinley"]
@@ -55,19 +56,19 @@ other source files or libraries.
  @link["https://www.flightaware.com/resources/airport/BOS/APD/AIRPORT+DIAGRAM/pdf"]{General Edward
   Lawrence Logan International Airport} following the information from its chart.
 
- @racketblock[
- (define-airport KBOS
-   [coordinates 42.36197 -71.0079]
-   [elevation 20]
-   [country US]
-   [size large]
-   [radio
-    ("D-ATIS" 135.0)
-    ("Tower East" 132.225)
-    ("Tower West" 128.8)
-    ("Ground" 121.75)
-    ("Clearance" 121.65)
-    ("Ramp" 134.05)])]
+ @examples[#:eval eval #:no-prompt #:label #f
+           (define-airport KBOS
+             [coordinates 42.36197 -71.0079]
+             [elevation 20]
+             [country US]
+             [size large]
+             [radio
+              ("D-ATIS" 135.0)
+              ("Tower East" 132.225)
+              ("Tower West" 128.8)
+              ("Ground" 121.75)
+              ("Clearance" 121.65)
+              ("Ramp" 134.05)])]
 }
 
 
@@ -90,13 +91,13 @@ other source files or libraries.
 
  The following is the defition for the PVD VOR.
 
- @racketblock[
- (define-vor PVD
-   [coordinates 41.7243003845215 -71.4296035766602]
-   [elevation 49]
-   [country US]
-   [frequency 115.6]
-   [power high])]
+ @examples[#:eval eval #:no-prompt #:label #f
+           (define-vor PVD
+             [coordinates 41.7243003845215 -71.4296035766602]
+             [elevation 49]
+             [country US]
+             [frequency 115.6]
+             [power high])]
 }
 
 @section["Flight planning"]
@@ -175,23 +176,17 @@ After making a flight plan, SkyJack gives you the tools to generate textual repo
 
  The following is a basic example of a flight plan text report generator:
 
- @racketblock[
- (define basic-report
-   (make-text-report-generator
-    [airport name ":\n"
-     elevation " - " coordinates "\n"
-     (radio "Clearance") "\n"
-     "----------------------------------------------"]
-    [vor name ":\n"
-     country " - " power "\n"
-     "----------------------------------------------"]))
- ]
-
- Once defined, the report generator can be used as follows:
-
- @racketblock[
- (display (basic-report boston-to-bangor))
- (display "\n\n\n")
- (display (basic-report boston-to-concord))
- ]
+ @examples[#:eval eval #:no-prompt #:label #f
+           (define basic-report
+             (make-text-report-generator
+              [airport name ":\n"
+               elevation " - " coordinates "\n"
+               (radio "Clearance") "\n"
+               "----------------------------------------------"]
+              [vor name ":\n"
+               country " - " power "\n"
+               "----------------------------------------------"]))
+           (display (basic-report boston-to-bangor))
+           (display (basic-report boston-to-concord))
+           ]
 }
